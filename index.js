@@ -1,18 +1,34 @@
-function minPathSum(grid) {
-  const m = grid.length;
-  const n = grid[0].length;
-  const dp = Array.from(Array(m), () => Array(n).fill(0));
-  dp[0][0] = grid[0][0];
-  for (let i = 1; i < m; i++) {
-    dp[i][0] = dp[i - 1][0] + grid[i][0];
+function minWindow(s, t) {
+  const map = new Map();
+  for (const char of t) {
+    map.set(char, (map.get(char) || 0) + 1);
   }
-  for (let j = 1; j < n; j++) {
-    dp[0][j] = dp[0][j - 1] + grid[0][j];
-  }
-  for (let i = 1; i < m; i++) {
-    for (let j = 1; j < n; j++) {
-      dp[i][j] = grid[i][j] + Math.min(dp[i - 1][j], dp[i][j - 1]);
+  let required = map.size;
+  let left = 0;
+  let right = 0;
+  let minLen = Infinity;
+  let substrStart = 0;
+  while (right < s.length) {
+    const char = s[right];
+    if (map.has(char)) {
+      map.set(char, map.get(char) - 1);
+      if (map.get(char) === 0) required--;
     }
+    while (required === 0) {
+      if (right - left + 1 < minLen) {
+        minLen = right - left + 1;
+        substrStart = left;
+      }
+      const leftChar = s[left];
+      if (map.has(leftChar)) {
+        map.set(leftChar, map.get(leftChar) + 1);
+        if (map.get(leftChar) > 0) required++;
+      }
+      left++;
+    }
+    right++;
   }
-  return dp[m - 1][n - 1];
+  return minLen === Infinity
+    ? ""
+    : s.substring(substrStart, substrStart + minLen);
 }
